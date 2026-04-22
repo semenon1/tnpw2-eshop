@@ -1,0 +1,20 @@
+Doména Product (Business entita)
+    Definovat stavový automat produktu (stavy ACTIVE, OUT_OF_STOCK, ARCHIVED a přechody mezi nimi).
+    Napsat pravidla pro manipulaci se skladovými zásobami (např. snížení počtu a automatická změna stavu na vyprodáno).
+IR03 (Asynchronní operace a API)
+    Sestavit strukturu testovacích dat pro mock databázi.
+    Naprogramovat asynchronní funkce pro čtení a změnu dat (simulace zpoždění sítě).
+    Zkompletovat tyto funkce do jednotného API rozhraní pro zbytek aplikace.
+IR05 (Selektory)
+    Napsat čisté funkce pro extrakci dat z centrálního stavu (odfiltrování vyřazených produktů).
+    Vytvořit logiku pro capabilities (vyhodnocení, zda lze u daného produktu provést akci).
+    Sestavit kompletní objekt ViewState, který spojí data a capabilities do jednoho balíku pro UI.
+IR06 (Renderovací logika)
+    Napsat funkce generující strukturu DOM uzlů pro vizuální komponenty (kartička produktu).
+    Implementovat podmíněné vykreslování (např. zobrazení upozornění u vyprodaného zboží na základě capabilities).
+    Naprogramovat funkci, která projde polem z ViewState a sestaví celkovou mřížku katalogu.
+IR07 (Handlery a vazby na akce)
+    Vytvořit callback funkce pro uživatelské události (např. kliknutí na tlačítko pro přidání do košíku).
+    Nastavit handlery tak, aby předávaly zprávu z UI do dispatcheru (vyvolání akce se správným payloadem).
+
+✅
