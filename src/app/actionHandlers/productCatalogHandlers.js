@@ -1,18 +1,18 @@
 
 export function productCatalogHandlers(dispatch, viewState) {
+  const { capabilities } = viewState;
+  const { canEnterCart } = capabilities;
+  
   const handlers = {};
 
-  handlers.onAddToCart = (productId) => {
+  handlers.onAddToCart = (productId) =>
     dispatch({
-      type: 'ADD_ITEM_TO_CART', 
-      payload: { productId } 
+      type: 'ADD_ITEM_TO_CART',
+      payload: { productId },
     });
-  };
 
-  if (viewState.capabilities.canEnterCart) {
-    handlers.onEnterCart = () => {
-      dispatch({ type: 'ENTER_CART' });
-    };
+  if (canEnterCart) {
+    handlers.onEnterCart = () => dispatch({ type: 'ENTER_CART' });
   }
 
   return handlers;
