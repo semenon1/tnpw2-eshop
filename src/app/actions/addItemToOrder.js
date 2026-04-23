@@ -1,34 +1,56 @@
 export async function addItemToOrder({ store, payload }) {
   const { product, quantity } = payload;
-  
-  if (quantity <= 0) {
-    console.warn("Počet kusů musí být větší než nula.");
-    return;
-  }
+  let notification = null;
 
-  store.setState((state) => {
-
-    if (state.currentOrder.status !== 'CART') {
-       console.warn("Nelze přidávat položky, objednávka už není ve stavu CART.");
-       return state;
+  try {
+    if (quantity <= 0) {
+      throw new Error("Počet kusů musí být větší než nula.");
     }
 
-    const newItem = {
-      productId: product.id,
-      quantity: quantity,
-      price: product.price
-    };
-
-    const updatedItems = [...state.currentOrder.items, newItem];
-    const updatedTotalPrice = state.currentOrder.totalPrice + (product.price * quantity); 
-
-    return {
-      ...state,
-      currentOrder: {
-        ...state.currentOrder,
-        items: updatedItems,
-        totalPrice: updatedTotalPrice
+    store.setState((state) => {
+      if (state.currentOrder.status !== 'CART') {
+        notification = {
+          type: 'WARNING',
+          message: "Nelze přidávat položky, objednávka už není ve stavu CART."
+        };
+        return { ...state, ui: { ...state.ui, notification } };
       }
-    };
-  });
+
+      const newItem = {
+        productId: product.id,
+        quantity: quantity,
+        price: product.price
+      };
+
+      const updatedItems = [...state.currentOrder.items, newItem];
+      
+      const updatedTotalPrice = state.currentOrder.totalPrice + (product.price * quantity);
+
+      notification = {
+        type: 'SUCCESS',
+        message: 'Produkt byl přidán do košíku.'
+      };
+
+      return {
+        ...state,
+        currentOrder: {
+          ...state.currentOrder,
+          items: updatedItems,
+          totalPrice: updatedTotalPrice
+        },
+        ui: {
+          ...state.ui,
+          notification
+        }
+      };
+    });
+  } catch (error) {
+    store.setState((state) => ({
+      ...state,
+      ui: {
+        ...state.ui,
+        notification: { type: 'WARNING', message: error.message },
+      },
+    }));
+  }
 }
