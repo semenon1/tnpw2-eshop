@@ -5,6 +5,7 @@ export function createMockDatabase() {
     // Mock * databáze *
     // ==================
 
+    // mini databáze s poli
     products: [
       {
         id: "p1",

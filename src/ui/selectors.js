@@ -1,38 +1,65 @@
 
+//základní selektor
 export function selectAllProducts(state) {
-  return state.products || [];
+  return state.products ?? [];
 }
 
-
-export function canAddToCart(state, product) {
+//capabilities
+export function canAddToCart(product) {
   return product.status === "ACTIVE" && product.stockCount > 0;
 }
 
+// pohledy
+
+// pohled: katalog produktů
 export function selectProductCatalogView(state) {
-  const products = selectAllProducts(state);
+  const allProducts = selectAllProducts(state);
   
-  const visibleProducts = products.filter(p => p.status !== "ARCHIVED");
+  const visibleProducts = allProducts.filter(p => p.status !== "ARCHIVED");
+
+  const productsWithCapabilities = visibleProducts.map(p => ({
+    ...p, 
+    capabilities: {
+      canBeAddedToCart: canAddToCart(p)
+    }
+  }));
 
   return {
     type: "PRODUCT_CATALOG",
-    products: visibleProducts,
+    products: productsWithCapabilities,
     capabilities: {
-      canViewCart: true 
+      canEnterCart: true 
     }
   };
 }
 
+
+//dipatcher pohledů
+/*
+ * Vrací objekt ve tvaru:
+ * {
+ * type: 'LOADING' | 'ERROR' | 'PRODUCT_CATALOG',
+ * message?: string,
+ * products?: Product[],
+ * capabilities?: {}
+ * }
+ */
 export function selectViewState(state) {
+  if (!state || !state.ui) {
+    return { type: "ERROR", message: "Stav UI chybí" };
+  }
+
   const { status, errorMessage, mode } = state.ui;
 
   if (status === "LOADING") return { type: "LOADING" };
   if (status === "ERROR") return { type: "ERROR", message: errorMessage };
-  if (status !== "READY") return { type: "ERROR", message: `Neznámý stav: ${status}` };
+  if (status !== "READY") return { type: "ERROR", message: `Neznámý stav UI: ${status}` };
 
   switch (mode) {
     case "CATALOG":
       return selectProductCatalogView(state);
+      
     default:
-      return { type: "ERROR", message: `Neznámý mód: ${mode}` };
+      return { type: "ERROR", message: `Neznámý mód aplikace: ${mode}` };
   }
 }
