@@ -9,7 +9,6 @@ export async function placeOrder({ store, api, payload }) {
       throw new Error("Nelze odeslat prázdný košík.");
     }
 
-    // Invariant: validní doručovací údaje [cite: 31]
     if (!deliveryDetails || !deliveryDetails.address) {
       throw new Error("Chybí doručovací údaje.");
     }
