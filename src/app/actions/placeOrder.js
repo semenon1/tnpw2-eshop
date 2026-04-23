@@ -1,28 +1,33 @@
 export async function placeOrder({ store, api, payload }) {
-  const state = store.getState();
-  const { currentOrder } = state;
+  const { token } = store.getState().auth;
+  const { currentOrder } = store.getState();
   const { deliveryDetails } = payload;
-
-  if (currentOrder.items.length === 0) {
-    console.warn("Nelze odeslat prázdný košík."); 
-    return;
-  }
-
-  if (!deliveryDetails || !deliveryDetails.address) {
-    console.warn("Chybí doručovací údaje."); 
-    return;
-  }
+  let notification = null;
 
   try {
-    const response = await api.products.placeOrder(currentOrder, deliveryDetails);
+    if (currentOrder.items.length === 0) {
+      throw new Error("Nelze odeslat prázdný košík.");
+    }
 
-    if (response.status === "SUCCESS") {
-      store.setState((state) => {
+    // Invariant: validní doručovací údaje [cite: 31]
+    if (!deliveryDetails || !deliveryDetails.address) {
+      throw new Error("Chybí doručovací údaje.");
+    }
+
+    const { status, reason, orderId } = await api.products.placeOrder(currentOrder, deliveryDetails, token);
+
+    store.setState((state) => {
+      if (status === "SUCCESS") {
         const finishedOrder = {
           ...state.currentOrder,
           status: 'PLACED',
           deliveryDetails: deliveryDetails,
-          id: response.orderId 
+          id: orderId 
+        };
+
+        notification = {
+          type: 'SUCCESS',
+          message: 'Objednávka byla úspěšně odeslána!'
         };
 
         return {
@@ -37,12 +42,33 @@ export async function placeOrder({ store, api, payload }) {
           ui: {
             ...state.ui,
             mode: 'ORDER_SUCCESS',
-            notification: { type: 'SUCCESS', message: 'Objednávka byla úspěšně odeslána!' }
+            notification
           }
         };
-      });
-    }
+      }
+
+      if (status === "REJECTED") {
+        notification = {
+          type: 'WARNING',
+          message: 'Objednávku nelze odeslat.'
+        };
+      }
+
+      return {
+        ...state,
+        ui: { ...state.ui, notification }
+      };
+    });
+
   } catch (error) {
-    console.error("Chyba při odesílání objednávky:", error);
+    store.setState((state) => ({
+      ...state,
+      ui: {
+        ...state.ui,
+        notification,
+        status: "ERROR",
+        message: error.message,
+      },
+    }));
   }
 }
