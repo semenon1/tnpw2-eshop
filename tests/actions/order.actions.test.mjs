@@ -1,5 +1,3 @@
-// Spuštění v terminálu: node tests/actions/order.actions.test.mjs
-
 import { assert } from "../assert.js";
 import { createStore } from "../../src/infra/store/createStore.js";
 import { addItemToOrder } from "../../src/app/actions/addItemToOrder.js";
@@ -172,6 +170,7 @@ console.log("\n[cancelOrder] SUCCESS - Stornování objednávky (PLACED -> CANCE
 {
   const store = createStore({
     auth: { token: 'token' },
+    currentOrder: { id: null, status: 'CART' },
     orders: [{ id: 'ord-1', status: 'PLACED' }],
     ui: { notification: null }
   });
@@ -191,7 +190,8 @@ console.log("\n[cancelOrder] ERROR - Storno expedované objednávky (porušení 
 {
   const store = createStore({
     auth: { token: 'token' },
-    orders: [{ id: 'ord-2', status: 'SHIPPED' }], // Už odesláno!
+    currentOrder: { id: null, status: 'CART' },
+    orders: [{ id: 'ord-2', status: 'SHIPPED' }], 
     ui: { notification: null, status: 'READY' }
   });
 
@@ -228,7 +228,7 @@ console.log("\n[shipOrder] SUCCESS - Expedice administrátorem (PLACED -> SHIPPE
 console.log("\n[shipOrder] ERROR - Běžný uživatel zkouší expedovat (Nedostatečná práva)");
 {
   const store = createStore({
-    auth: { token: 'user-token', role: 'USER' }, // Není admin!
+    auth: { token: 'user-token', role: 'ANONYMOUS' },
     orders: [{ id: 'ord-4', status: 'PLACED' }],
     ui: { notification: null, status: 'READY' }
   });
@@ -240,4 +240,4 @@ console.log("\n[shipOrder] ERROR - Běžný uživatel zkouší expedovat (Nedost
   assert(state.ui.message.includes('oprávnění'), "Zachycena zpráva o oprávnění");
 }
 
-console.log("\n── Všechny testy domény Order hotovy ──\n");
+console.log("\n── Všechny testy Order hotovy ──\n");
