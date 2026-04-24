@@ -1,7 +1,7 @@
 
 //v terminálu: node tests/infra/selectors.test.mjs
 
-import { assert } from "../assert.js";
+import { assert } from "../old/assert.js";
 import {
   selectProductCatalogView,
   selectViewState,

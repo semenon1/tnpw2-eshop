@@ -1,7 +1,7 @@
 
 // v terminálu: node tests/api/productsApi.test.mjs
 
-import { assert } from "../assert.js";
+import { assert } from "../old/assert.js";
 import { createProductsApi } from "../../src/api/productsApi.js";
 
 
