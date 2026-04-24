@@ -20,7 +20,7 @@ export function selectProductCatalogView(state) {
   const productsWithCapabilities = visibleProducts.map(p => ({
     ...p, 
     capabilities: {
-      canBeAddedToCart: canAddToCart(p)
+      canBePurchased: canAddToCart(p)
     }
   }));
 
