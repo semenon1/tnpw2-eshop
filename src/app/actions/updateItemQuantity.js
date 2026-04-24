@@ -3,11 +3,14 @@ export async function updateItemQuantity({ store, api, payload }) {
   let notification = null;
 
   try {
+
+    //invarianta: počet kusů u jakékoli položky v košíku musí být celé číslo větší než nula
     if (!Number.isInteger(quantity) || quantity <= 0) {
       throw new Error("Počet kusů musí být větší než nula.");
     }
 
     store.setState((state) => {
+      //invarianta: pokud status ≠ CART, nelze měnit množství položek
       if (state.currentOrder.status !== 'CART') {
         notification = { type: "WARNING", message: "Množství lze měnit pouze ve stavu košíku." };
         return { ...state, ui: { ...state.ui, notification } };

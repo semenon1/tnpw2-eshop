@@ -4,6 +4,7 @@ export async function removeItemFromOrder({ store, api, payload }) {
 
   try {
     store.setState((state) => {
+      //invarianta: pokud status ≠ CART, nelze do ní přidávat další produkty ani měnit jejich množství
       if (state.currentOrder.status !== 'CART') {
         notification = { type: "WARNING", message: "Položky lze odebírat pouze ve stavu košíku." };
         return { ...state, ui: { ...state.ui, notification } };

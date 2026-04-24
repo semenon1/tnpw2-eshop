@@ -1,8 +1,10 @@
 export async function cancelOrder({ store, api, payload }) {
-  const { token } = store.getState().auth;
+  const state = store.getState();
+  const { token, role } = state.auth; // Můžeme si vytáhnout i roli
   const { orderId } = payload || {};
   let notification = null;
 
+  
   try {
     if (!orderId || store.getState().currentOrder.id === orderId) {
       store.setState((state) => {
@@ -19,6 +21,22 @@ export async function cancelOrder({ store, api, payload }) {
         };
       });
       return; 
+    }
+
+    //PLACED -> CANCELED
+    const orderToCancel = state.orders.find(o => o.id === orderId);
+
+    if (!orderToCancel) {
+       throw new Error("Objednávka nebyla nalezena.");
+    }
+
+    //invarianta: pouze objednávky ve stavu PLACED lze stornovat
+    if (orderToCancel.status === "SHIPPED") {
+       throw new Error("Objednávku nelze stornovat, již byla expedována.");
+    }
+    
+    if (orderToCancel.status === "CANCELED") {
+       throw new Error("Tato objednávka je již stornována.");
     }
 
     const { status, reason, order } = await api.orders.cancelOrder(orderId, token);

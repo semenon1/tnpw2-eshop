@@ -3,14 +3,15 @@ export async function addItemToOrder({ store, payload }) {
   let notification = null;
 
   try {
+    //invarianta: počet kusů u jakékoli položky v košíku musí být celé číslo větší než nula
     if (!Number.isInteger(quantity) ||quantity <= 0) {
-      throw new Error("Počet kusů musí být větší než nula.");
+      throw new Error("Počet kusů u jakékoli položky v košíku musí být celé číslo větší než nula.");
     }
-
+    //invarianta: produkt musí být aktivní, aby mohl být přidán do košíku
     if (product.status !== 'ACTIVE') {
       throw new Error("Tento produkt již není aktivní a nelze jej přidat do košíku.");
     }
-
+    //invarianta: pokud status ≠ CART, nelze do ní přidávat další produkty ani měnit jejich množství 
     store.setState((state) => {
       if (state.currentOrder.status !== 'CART') {
         notification = {
