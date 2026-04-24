@@ -3,8 +3,12 @@ export async function addItemToOrder({ store, payload }) {
   let notification = null;
 
   try {
-    if (quantity <= 0) {
+    if (!Number.isInteger(quantity) ||quantity <= 0) {
       throw new Error("Počet kusů musí být větší než nula.");
+    }
+
+    if (product.status !== 'ACTIVE') {
+      throw new Error("Tento produkt již není aktivní a nelze jej přidat do košíku.");
     }
 
     store.setState((state) => {

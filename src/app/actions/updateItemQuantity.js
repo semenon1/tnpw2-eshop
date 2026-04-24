@@ -3,7 +3,7 @@ export async function updateItemQuantity({ store, api, payload }) {
   let notification = null;
 
   try {
-    if (quantity <= 0) {
+    if (!Number.isInteger(quantity) || quantity <= 0) {
       throw new Error("Počet kusů musí být větší než nula.");
     }
 
