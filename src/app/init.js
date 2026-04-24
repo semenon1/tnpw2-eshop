@@ -3,13 +3,17 @@ import { createInitialState } from "./app/state.js";
 import { createDispatcher } from "./app/dispatch.js";
 import { createApi } from "./api/mockApi.js";
 import { urlToAction, updateUrl } from "./infra/router/router.js";
+import { render } from "./ui/render.js";
 
 const store = createStore(createInitialState());
 const api = createApi();
 const dispatch = createDispatcher(store, api);
 
+const root = document.getElementById("app");
+
 store.subscribe((state) => {
   updateUrl(state);
+  render(root, state, dispatch);
 });
 
 
