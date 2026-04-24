@@ -5,15 +5,19 @@ export async function placeOrder({ store, api, payload }) {
   const deliveryDetails = payload?.deliveryDetails || currentOrder.deliveryDetails;
   let notification = null;
 
+  //prechod CART -> PLACED
+
   try {
+    //invarianta: objednávka ve stavu PLACED nebo SHIPPED nesmí být prázdná 
     if (currentOrder.items.length === 0) {
       throw new Error("Nelze odeslat prázdný košík.");
     }
-
+    //invarianta: objednávka ve stavu PLACED musí mít vyplněné doručovací údaje
     if (!deliveryDetails || !deliveryDetails.address) {
       throw new Error("Chybí doručovací údaje.");
     }
 
+    //invarianta: všechny položky v objednávce musí být aktivní a musí být skladem v požadovaném množství
     for (const item of currentOrder.items) {
       const product = products.find(p => p.id === item.productId);
       if (!product) continue;

@@ -4,6 +4,7 @@ export async function setDeliveryDetails({ store, payload }) {
 
   try {
     store.setState((state) => {
+      //invarianta: pokud status ≠ CART, nelze měnit doručovací údaje
       if (state.currentOrder.status !== 'CART') {
         notification = { type: 'WARNING', message: "Doručovací údaje lze měnit pouze u rozpracované objednávky." };
         return { ...state, ui: { ...state.ui, notification } };

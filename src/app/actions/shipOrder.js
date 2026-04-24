@@ -3,6 +3,8 @@ export async function shipOrder({ store, api, payload }) {
   const { orderId } = payload;
   let notification = null;
 
+  //prechod PLACED -> SHIPPED
+
   try {
     if (role !== 'ADMIN') {
       throw new Error("K této akci nemáte oprávnění.");
