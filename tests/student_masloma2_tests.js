@@ -23,18 +23,28 @@ function clone(obj) {
 // ==========================================
 
 export async function testScenario_addItemToOrder() {
-  let state1 = { currentOrder: { status: 'CART', items: [], totalPrice: 0 }, ui: { notification: null } };
+  let state1 = { 
+    products: [{ id: 'p1', price: 50, status: 'ACTIVE' }],
+    currentOrder: { status: 'CART', items: [], totalPrice: 0 }, 
+    ui: { notification: null } 
+  };
   const store1 = createStore(clone(state1));
-  await addItemToOrder({ store: store1, payload: { product: { id: 'p1', price: 50, status: 'ACTIVE' }, quantity: 2 } });
+  
+  await addItemToOrder({ store: store1, payload: { productId: 'p1', quantity: 2 } });
   
   const newState1 = store1.getState();
   console.assert(newState1.currentOrder.items.length === 1, "Položka úspěšně přidána do košíku");
   console.assert(newState1.currentOrder.totalPrice === 100, "Celková cena je správně spočítána (100 Kč)");
   console.assert(newState1.ui.notification?.type === 'SUCCESS', "Notifikace je SUCCESS");
 
-  let state2 = { currentOrder: { status: 'PLACED', items: [], totalPrice: 0 }, ui: { notification: null } };
+  let state2 = { 
+    products: [{ id: 'p1', price: 50, status: 'ACTIVE' }],
+    currentOrder: { status: 'PLACED', items: [], totalPrice: 0 }, 
+    ui: { notification: null } 
+  };
   const store2 = createStore(clone(state2));
-  await addItemToOrder({ store: store2, payload: { product: { id: 'p1', price: 50, status: 'ACTIVE' }, quantity: 1 } });
+  
+  await addItemToOrder({ store: store2, payload: { productId: 'p1', quantity: 1 } });
   
   const newState2 = store2.getState();
   console.assert(newState2.currentOrder.items.length === 0, "Položka nebyla přidána, protože status není CART");

@@ -1,8 +1,16 @@
 export async function addItemToOrder({ store, payload }) {
-  const { product, quantity } = payload;
+  // Nastavíme výchozí quantity na 1, pokud chybí
+  const { productId, quantity = 1 } = payload;
   let notification = null;
 
   try {
+    const state = store.getState();
+    const product = state.products.find(p => p.id === productId);
+
+    if (!product) {
+      throw new Error("Produkt nebyl nalezen.");
+    }
+
     //invarianta: počet kusů u jakékoli položky v košíku musí být celé číslo větší než nula
     if (!Number.isInteger(quantity) ||quantity <= 0) {
       throw new Error("Počet kusů u jakékoli položky v košíku musí být celé číslo větší než nula.");
@@ -28,7 +36,6 @@ export async function addItemToOrder({ store, payload }) {
       };
 
       const updatedItems = [...state.currentOrder.items, newItem];
-      
       const updatedTotalPrice = state.currentOrder.totalPrice + (product.price * quantity);
 
       notification = {
