@@ -3,7 +3,7 @@ export function createInitialState() {
     products: [],     
     orders: [],       
 
-    order: {
+    currentOrder: {
       id: null,
       status: 'CART',
       items: [],      

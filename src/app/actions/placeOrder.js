@@ -1,7 +1,8 @@
 export async function placeOrder({ store, api, payload }) {
-  const { token } = store.getState().auth;
-  const { currentOrder } = store.getState();
-  const { deliveryDetails } = payload;
+  const state = store.getState();
+  const { token } = state.auth;
+  const { currentOrder, products } = state;
+  const deliveryDetails = payload?.deliveryDetails || currentOrder.deliveryDetails;
   let notification = null;
 
   try {
@@ -13,6 +14,18 @@ export async function placeOrder({ store, api, payload }) {
       throw new Error("Chybí doručovací údaje.");
     }
 
+    for (const item of currentOrder.items) {
+      const product = products.find(p => p.id === item.productId);
+      if (!product) continue;
+
+      if (product.status !== 'ACTIVE') {
+        throw new Error(`Položka v košíku již není aktivní. Objednávku nelze odeslat.`);
+      }
+      if (product.stockCount === 0 || product.stockCount < item.quantity) {
+        throw new Error(`Zboží již není skladem v požadovaném množství. Objednávku nelze odeslat.`);
+      }
+    }
+
     const { status, reason, orderId } = await api.products.placeOrder(currentOrder, deliveryDetails, token);
 
     store.setState((state) => {
@@ -22,11 +35,6 @@ export async function placeOrder({ store, api, payload }) {
           status: 'PLACED',
           deliveryDetails: deliveryDetails,
           id: orderId 
-        };
-
-        notification = {
-          type: 'SUCCESS',
-          message: 'Objednávka byla úspěšně odeslána!'
         };
 
         return {
@@ -41,21 +49,14 @@ export async function placeOrder({ store, api, payload }) {
           ui: {
             ...state.ui,
             mode: 'ORDER_SUCCESS',
-            notification
+            notification: { type: 'SUCCESS', message: 'Objednávka byla úspěšně odeslána!' }
           }
-        };
-      }
-
-      if (status === "REJECTED") {
-        notification = {
-          type: 'WARNING',
-          message: 'Objednávku nelze odeslat.'
         };
       }
 
       return {
         ...state,
-        ui: { ...state.ui, notification }
+        ui: { ...state.ui, notification: { type: 'WARNING', message: 'Objednávku nelze odeslat.' } }
       };
     });
 
