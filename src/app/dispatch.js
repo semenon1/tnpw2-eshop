@@ -13,6 +13,17 @@ export function createDispatcher(store, api) {
     const { type, payload = {} } = action ?? {};
 
     switch (type) {
+      case "APP_INIT":
+          api.products.getProducts().then((result) => {
+            if (result.status === "SUCCESS") {
+              store.setState((state) => ({
+                ...state,
+                products: result.products,
+                ui: { ...state.ui, status: "READY", mode: "CATALOG" }
+              }));
+            }
+          });
+          return; 
       case "LOGIN":
         return loginUser({ store, api, payload });
       case "LOGOUT":

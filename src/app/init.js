@@ -1,9 +1,9 @@
-import { createStore } from "./infra/store/createStore.js";
-import { createInitialState } from "./app/state.js";
-import { createDispatcher } from "./app/dispatch.js";
-import { createApi } from "./api/mockApi.js";
-import { urlToAction, updateUrl } from "./infra/router/router.js";
-import { render } from "./ui/render.js";
+import { createStore } from "../infra/store/createStore.js";
+import { createInitialState } from "./state.js";
+import { createDispatcher } from "./dispatch.js";
+import { createApi } from "../api/mockApi.js";
+import { urlToAction, updateUrl } from "../infra/router/router.js";
+import { render } from "../ui/render.js";
 
 const store = createStore(createInitialState());
 const api = createApi();
